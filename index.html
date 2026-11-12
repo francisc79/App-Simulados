@@ -103,7 +103,7 @@
         </div>
 
         <div class="exam-meta-mini">
-          <span>Respondidas: <strong id="answeredCountText">0</strong> de <strong>12</strong></span>
+          <span>Respondidas: <strong id="answeredCountText">0</strong> de <strong id="examTotalCount">12</strong></span>
         </div>
       </div>
     </aside>
@@ -128,7 +128,9 @@
       <!-- Aba 1: Configuração do Simulado (Nome e Data) -->
       <section class="tab-pane active" id="tab-settings">
         <h3>Dados do Simulado</h3>
-        <p class="tab-description">Altere as informações da prova e redefina o conjunto de 12 questões.</p>
+        <p class="tab-description">Defina a quantidade de questões e os temas que deseja praticar.</p>
+        <div class="form-group"><label for="examQuestionCount">Quantidade de questões por simulado (1 a 100):</label><input type="number" id="examQuestionCount" class="form-control" min="1" max="100" value="12"></div>
+        <div class="form-group"><label>Sortear questões destes temas (nenhum selecionado = todos):</label><div class="category-filter-list"><label><input class="category-filter" type="checkbox" value="BNCC"> BNCC</label><label><input class="category-filter" type="checkbox" value="LDB"> LDB</label><label><input class="category-filter" type="checkbox" value="Tipologia Textual"> Tipologia Textual</label><label><input class="category-filter" type="checkbox" value="Gêneros Textuais"> Gêneros Textuais</label><label><input class="category-filter" type="checkbox" value="Português"> Português</label><label><input class="category-filter" type="checkbox" value="Matemática"> Matemática</label><label><input class="category-filter" type="checkbox" value="Legislação"> Legislação</label><label><input class="category-filter" type="checkbox" value="Didática"> Didática</label><label><input class="category-filter" type="checkbox" value="Conhecimentos Gerais"> Conhecimentos Gerais</label><label><input class="category-filter" type="checkbox" value="Geral"> Geral / Sem classificação</label></div></div>
 
         <form id="formExamSettings" class="app-form">
           <div class="form-group">
@@ -149,7 +151,7 @@
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
               </svg>
-              Gerar Novo Simulado (Sortear 12)
+              Gerar Novo Simulado (sortear questões)
             </button>
           </div>
         </form>
@@ -172,8 +174,7 @@
           <h3>Adicionar Questões</h3>
           <span class="sub-badge" id="bankCounterInTab">Banco: 0</span>
         </div>
-        <p class="tab-description">Importe várias questões de uma vez via arquivo JSON ou colando o texto, ou cadastre
-          individualmente.</p>
+        <p class="tab-description">Importe questões em lote ou cadastre individualmente. Cada questão pode ser classificada por tema.</p>
 
         <!-- Seletor de Modo: Em Massa vs Manual -->
         <div class="subtabs-nav">
@@ -229,7 +230,7 @@
             </label>
             <label class="checkbox-label">
               <input type="checkbox" id="checkStartExamImmediately" checked>
-              <span>Iniciar simulado de 12 questões imediatamente com as novas questões</span>
+              <span>Iniciar simulado imediatamente com as questões importadas</span>
             </label>
           </div>
 
@@ -256,6 +257,7 @@
                 placeholder="Digite o texto da questão, contexto ou caso hipotético..." required></textarea>
             </div>
 
+            <div class="form-group"><label for="newQuestionCategory">Categoria / Tema:</label><select id="newQuestionCategory" class="form-control"><option>BNCC</option><option>LDB</option><option>Tipologia Textual</option><option>Gêneros Textuais</option><option>Português</option><option>Matemática</option><option>Legislação</option><option>Didática</option><option>Conhecimentos Gerais</option><option selected>Geral</option></select></div>
             <div class="form-group">
               <label>Alternativas (A a E): *</label>
               <div class="option-input-row">
@@ -380,7 +382,7 @@
 
       <!-- Gabarito Comentado e Revisão Detalhada -->
       <div class="results-review-section">
-        <h3>Gabarito e Correção Detalhada das 12 Questões</h3>
+        <h3>Gabarito e Correção Detalhada</h3>
         <div id="resultsDetailedReviewList" class="detailed-review-list">
           <!-- Detalhes questão a questão inseridos via JS -->
         </div>
