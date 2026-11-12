@@ -1,6 +1,6 @@
 /**
  * Simulador de Prova - Estilo Anhanguera / Kroton
- * Funcionalidades: Prova de 12 questões, navegação idêntica ao modelo,
+ * Funcionalidades: simulados configuráveis, navegação por questões,
  * cronômetro, barra de progresso, feedback de acertos e erros,
  * drawer lateral com gerenciador de simulado, cadastro de questões e histórico.
  */
@@ -233,24 +233,24 @@ function saveMetadata() {
 }
 
 // ==========================================
-// INICIALIZAÇÃO DO SIMULADO DE 12 QUESTÕES
+// INICIALIZAÇÃO DO SIMULADO
 // ==========================================
 
 function startExam(questionsToUse = null) {
   if (questionsToUse && questionsToUse.length === EXAM_LENGTH) {
     currentExamQuestions = [...questionsToUse];
   } else {
-    // Se o banco tiver pelo menos 12 questões, pegamos as 12 primeiras ou sorteamos
-    // Para manter a fidelidade com a Questão 4 do modelo na primeira inicialização,
-    // garantimos que as 12 questões iniciais venham prontas.
+    // Restaura uma prova em andamento, preservando a quantidade dinâmica de questões.
     const savedActiveExam = localStorage.getItem("anhanguera_current_exam_state");
     if (savedActiveExam) {
       try {
         const parsed = JSON.parse(savedActiveExam);
-        if (parsed.questions && parsed.questions.length === EXAM_LENGTH) {
+        if (Array.isArray(parsed.questions) && parsed.questions.length > 0) {
           currentExamQuestions = parsed.questions;
+          EXAM_LENGTH = currentExamQuestions.length;
+          if (dom.examQuestionCount) dom.examQuestionCount.value = EXAM_LENGTH;
           userAnswers = parsed.answers || {};
-          currentQuestionIndex = parsed.currentIndex || 0;
+          currentQuestionIndex = Math.min(parsed.currentIndex || 0, EXAM_LENGTH - 1);
           timerSeconds = parsed.timerSeconds || 0;
           initTimer();
           renderActiveQuestion();
@@ -263,7 +263,7 @@ function startExam(questionsToUse = null) {
       }
     }
 
-    // Caso novo: pega as 12 primeiras do banco
+    // Caso novo: inicia com as questões iniciais do banco.
     if (questionBank.length >= EXAM_LENGTH) {
       currentExamQuestions = questionBank.slice(0, EXAM_LENGTH);
     } else {
