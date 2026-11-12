@@ -50,6 +50,39 @@ Sistema completo de simulados e avaliações online desenvolvido no padrão visu
 
 ---
 
+## 🧩 Banco de questões por temas e simulados configuráveis
+
+- O banco aceita importação em lote de centenas ou milhares de questões, sem limite artificial de 1.000 registros no código.
+- Cada questão pode informar sua categoria usando `category`, `categoria` ou `tema` no JSON.
+- Categorias disponíveis: BNCC, LDB, Tipologia Textual, Gêneros Textuais, Português, Matemática, Legislação, Didática, Conhecimentos Gerais e Geral.
+- Na configuração do simulado, é possível escolher de 1 a 100 questões por tentativa.
+- É possível selecionar um ou mais temas; sem filtros marcados, o sorteio considera todo o banco.
+- Questões antigas sem categoria são migradas automaticamente para uma categoria, quando existe classificação padrão; as demais ficam em **Geral**.
+- A importação e a exportação JSON preservam a categoria da questão.
+- A nota de aprovação usa o percentual de 60%, independentemente da quantidade de questões da prova.
+
+Exemplo de questão JSON com categoria:
+
+```json
+{
+  "statement": "Enunciado da questão...",
+  "category": "BNCC",
+  "options": [
+    { "id": "A", "text": "Alternativa A" },
+    { "id": "B", "text": "Alternativa B" },
+    { "id": "C", "text": "Alternativa C" },
+    { "id": "D", "text": "Alternativa D" },
+    { "id": "E", "text": "Alternativa E" }
+  ],
+  "correctAnswer": "B",
+  "explanation": "Comentário pedagógico."
+}
+```
+
+**Persistência:** nesta versão, o banco continua salvo no `localStorage` do navegador. Para uso com bancos muito grandes ou sincronização entre dispositivos, a próxima evolução recomendada é migrar o armazenamento para IndexedDB ou um backend.
+
+---
+
 ## 🚀 Como Executar
 
 Basta abrir o arquivo **`index.html`** em qualquer navegador moderno (Google Chrome, Microsoft Edge, Firefox, Brave, Safari):
