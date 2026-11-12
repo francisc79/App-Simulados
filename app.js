@@ -33,6 +33,7 @@ const dom = {
   headerExamDate: document.getElementById("headerExamDate"),
   btnOpenSidebar: document.getElementById("btnOpenSidebar"),
   historyCounterBadge: document.getElementById("historyCounterBadge"),
+  btnThemeToggle: document.getElementById("btnThemeToggle"),
 
   // Tela da Questão
   currentQuestionTitle: document.getElementById("currentQuestionTitle"),
@@ -1282,11 +1283,39 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+
+// ==========================================
+// MODO ESCURO
+// ==========================================
+const THEME_STORAGE_KEY = "simulados_theme";
+
+function applySavedTheme(theme) {
+  const dark = theme === "dark";
+  document.body.classList.toggle("dark-mode", dark);
+  if (dom.btnThemeToggle) {
+    dom.btnThemeToggle.innerHTML = dark ? "☀️ <span>Modo claro</span>" : "🌙 <span>Modo escuro</span>";
+    dom.btnThemeToggle.setAttribute("aria-label", dark ? "Ativar modo claro" : "Ativar modo escuro");
+    dom.btnThemeToggle.title = dark ? "Ativar modo claro" : "Ativar modo escuro";
+  }
+}
+
+function initializeThemeToggle() {
+  applySavedTheme(localStorage.getItem(THEME_STORAGE_KEY) || "light");
+  if (dom.btnThemeToggle) {
+    dom.btnThemeToggle.addEventListener("click", () => {
+      const nextTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      applySavedTheme(nextTheme);
+    });
+  }
+}
+
 // ==========================================
 // INICIALIZAÇÃO DA APLICAÇÃO
 // ==========================================
 
 document.addEventListener("DOMContentLoaded", () => {
+  initializeThemeToggle();
   loadBankAndMetadata();
   startExam();
   updateHistoryUI();
