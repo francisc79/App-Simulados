@@ -95,6 +95,7 @@ const dom = {
   newExplanation: document.getElementById("newExplanation"),
   newQuestionCategory: document.getElementById("newQuestionCategory"),
   examQuestionCount: document.getElementById("examQuestionCount"),
+  examTotalCount: document.getElementById("examTotalCount"),
   categoryFilters: document.querySelectorAll(".category-filter"),
 
   // Histórico
@@ -439,10 +440,12 @@ function renderBubbles() {
 }
 
 function updateProgressBar() {
+  const total = currentExamQuestions.length || EXAM_LENGTH;
   const answeredCount = Object.keys(userAnswers).length;
-  const percent = (answeredCount / EXAM_LENGTH) * 100;
+  const percent = total ? (answeredCount / total) * 100 : 0;
   dom.progressBarFill.style.width = `${percent}%`;
   dom.answeredCountText.textContent = answeredCount;
+  if (dom.examTotalCount) dom.examTotalCount.textContent = total;
 }
 
 // ==========================================
@@ -1236,7 +1239,10 @@ if (dom.btnProcessBulkImport) {
       } else {
         const remainder = getEligibleQuestions().filter((q) => !importedEligible.some((rq) => rq.id === q.id));
         currentExamQuestions = [...importedEligible, ...remainder].slice(0, EXAM_LENGTH);
-        if (currentExamQuestions.length < EXAM_LENGTH) showToast(`Há apenas ${currentExamQuestions.length} questões compatíveis com os filtros.`);
+        if (currentExamQuestions.length < EXAM_LENGTH) {
+          showToast(`Não foi possível iniciar: há somente ${currentExamQuestions.length} questões compatíveis. Ajuste os temas ou importe mais questões.`);
+          return;
+        }
       }
 
       userAnswers = {};
