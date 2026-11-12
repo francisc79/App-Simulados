@@ -36,6 +36,15 @@ const dom = {
   headerExamDate: document.getElementById("headerExamDate"),
   btnOpenSidebar: document.getElementById("btnOpenSidebar"),
   historyCounterBadge: document.getElementById("historyCounterBadge"),
+  btnThemeToggle: document.getElementById("btnThemeToggle"),
+  welcomeOverlay: document.getElementById("welcomeOverlay"),
+  welcomeForm: document.getElementById("welcomeForm"),
+  studentNameInput: document.getElementById("studentNameInput"),
+  gamificationEmoji: document.getElementById("gamificationEmoji"),
+  gamificationTitle: document.getElementById("gamificationTitle"),
+  gamificationMessage: document.getElementById("gamificationMessage"),
+  gamificationProgressFill: document.getElementById("gamificationProgressFill"),
+  btnRetryExamFromResults: document.getElementById("btnRetryExamFromResults"),
 
   // Tela da Questão
   currentQuestionTitle: document.getElementById("currentQuestionTitle"),
@@ -553,6 +562,21 @@ function displayResultsModal(record) {
     dom.resultPerformancePill.className = "performance-pill failed";
   }
 
+  const ratio = record.totalQuestions ? record.correctCount / record.totalQuestions : 0;
+  let feedback;
+  if (ratio < (4 / 12)) {
+    feedback = { level: "low", emoji: "💪", title: "Não desanime!", message: `${getStudentName() || "Você"}, cada tentativa é uma oportunidade de aprender. Revise os comentários e tente novamente.` };
+  } else if (ratio < (7 / 12)) {
+    feedback = { level: "medium", emoji: "🌟", title: "Você está evoluindo!", message: `${getStudentName() || "Você"}, já existe progresso. Reforce os assuntos em que errou e continue praticando.` };
+  } else {
+    feedback = { level: "high", emoji: "🏆", title: "Excelente trabalho!", message: `Parabéns, ${getStudentName() || "você"}! Seu desempenho merece reconhecimento. Continue nesse ritmo!` };
+  }
+  dom.gamificationEmoji.textContent = feedback.emoji;
+  dom.gamificationTitle.textContent = feedback.title;
+  dom.gamificationMessage.textContent = feedback.message;
+  dom.gamificationFeedback.className = `gamification-feedback ${feedback.level}`;
+  dom.gamificationProgressFill.style.width = `${Math.max(0, Math.min(100, Number(record.scorePercent)))}%`;
+
   dom.statCorrectCount.textContent = record.correctCount;
   dom.statWrongCount.textContent = record.wrongCount;
   dom.statTimeSpent.textContent = record.durationFormatted;
@@ -608,6 +632,8 @@ function displayResultsModal(record) {
 dom.btnCloseResults.addEventListener("click", () => {
   dom.resultsModal.classList.remove("active");
 });
+
+dom.btnRetryExamFromResults.addEventListener("click", restartSameExam);
 
 dom.btnStartNewFromResults.addEventListener("click", () => {
   dom.resultsModal.classList.remove("active");
@@ -1320,6 +1346,8 @@ document.addEventListener("keydown", (e) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadBankAndMetadata();
+  initializeTheme();
   startExam();
   updateHistoryUI();
+  showWelcomeIfNeeded();
 });
