@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Prova - SELECAO 2026</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Barra Superior Minimalista -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="exam-info">
+        <h1 id="headerExamTitle">Simulado de Avaliação - JAMILE</h1>
+        <span class="exam-date-badge" id="headerExamDate">Data: 09/11/2026</span>
+      </div>
+      <div class="header-actions">
+        <button id="btnOpenSidebar" class="btn-sidebar-toggle" title="Abrir Menu, Adicionar Questões e Histórico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <span>Menu & Histórico</span>
+          <span class="history-count-badge" id="historyCounterBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container Principal da Prova (Tela Inicial com Questão e Opções) -->
+  <main class="exam-container">
+    <!-- Coluna Esquerda: Questão Ativa -->
+    <section class="question-column">
+      <div class="question-card">
+        <h2 class="question-title" id="currentQuestionTitle">Questão 1</h2>
+
+        <div class="question-statement" id="currentQuestionStatement">
+          <!-- O texto da questão será inserido dinamicamente aqui -->
+        </div>
+
+        <div class="options-container" id="currentQuestionOptions">
+          <!-- As opções A, B, C, D, E serão geradas dinamicamente aqui -->
+        </div>
+
+        <!-- Botões de Navegação -->
+        <div class="nav-buttons-row">
+          <button id="btnPrev" class="btn-nav btn-prev">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>ANTERIOR</span>
+          </button>
+          <button id="btnNext" class="btn-nav btn-next">
+            <span>PRÓXIMA</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Botão Finalizar Prova -->
+        <div class="finish-button-row">
+          <button id="btnFinish" class="btn-finish">FINALIZAR PROVA</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coluna Direita: Card Questões da Prova (Anhanguera Style) -->
+    <aside class="exam-sidebar-column">
+      <div class="exam-status-card">
+        <h3 class="status-card-title">Questões da Prova</h3>
+
+        <!-- Grade de Bolinhas das 12 Questões -->
+        <div class="question-bubbles-grid" id="questionBubblesGrid">
+          <!-- 12 bolinhas geradas dinamicamente (ex: 1A, 2C, 3D, 4A...) -->
+        </div>
+
+        <!-- Barra de Progresso de Respostas -->
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+        </div>
+
+        <!-- Tempo de Prova -->
+        <div class="exam-timer-wrapper">
+          <div class="timer-label">Tempo de Prova</div>
+          <div class="timer-display">
+            <span id="examTimerText">00:00:00</span>
+            <svg class="clock-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0080c8"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="exam-meta-mini">
+          <span>Respondidas: <strong id="answeredCountText">0</strong> de <strong>12</strong></span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Barra Lateral (Drawer) de Configurações, Cadastro de Questões e Histórico -->
+  <div class="sidebar-drawer-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar-drawer" id="sidebarDrawer">
+    <div class="drawer-header">
+      <h2>Painel do Simulado</h2>
+      <button class="btn-close-drawer" id="btnCloseSidebar" title="Fechar">&times;</button>
+    </div>
+
+    <!-- Navegação de Abas do Menu Lateral -->
+    <nav class="drawer-tabs">
+      <button class="tab-button active" data-tab="tab-settings">Configurações</button>
+      <button class="tab-button" data-tab="tab-add-question">Nova Questão</button>
+      <button class="tab-button" data-tab="tab-history">Histórico</button>
+    </nav>
+
+    <div class="drawer-content">
+      <!-- Aba 1: Configuração do Simulado (Nome e Data) -->
+      <section class="tab-pane active" id="tab-settings">
+        <h3>Dados do Simulado</h3>
+        <p class="tab-description">Altere as informações da prova e redefina o conjunto de 12 questões.</p>
+
+        <form id="formExamSettings" class="app-form">
+          <div class="form-group">
+            <label for="inputExamTitle">Nome do Simulado:</label>
+            <input type="text" id="inputExamTitle" class="form-control"
+              placeholder="Ex: Simulado Oficial Anhanguera - Língua Portuguesa" required>
+          </div>
+
+          <div class="form-group">
+            <label for="inputExamDate">Data do Simulado:</label>
+            <input type="date" id="inputExamDate" class="form-control" required>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary-action">Salvar Informações</button>
+            <button type="button" id="btnNewRandomExam" class="btn-secondary-action">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              Gerar Novo Simulado (Sortear 12)
+            </button>
+          </div>
+        </form>
+
+        <div class="bank-stats-box">
+          <h4>Status do Banco de Questões</h4>
+          <p>Total de questões disponíveis no banco: <strong id="totalBankQuestionsCount">0</strong></p>
+          <button id="btnResetToDefaultBank" class="btn-link-action">Restaurar Banco de Questões Padrão</button>
+          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-medium);">
+            <button type="button" id="btnLoadScreenshotDemo" class="btn-secondary-action" style="width: 100%;">
+              📸 Carregar Exemplo Idêntico à Imagem (Questão 4)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Aba 2: Adicionar Questões (Em Massa ou Individual) -->
+      <section class="tab-pane" id="tab-add-question">
+        <div class="pane-header-with-badge">
+          <h3>Adicionar Questões</h3>
+          <span class="sub-badge" id="bankCounterInTab">Banco: 0</span>
+        </div>
+        <p class="tab-description">Importe várias questões de uma vez via arquivo JSON ou colando o texto, ou cadastre
+          individualmente.</p>
+
+        <!-- Seletor de Modo: Em Massa vs Manual -->
+        <div class="subtabs-nav">
+          <button type="button" class="subtab-btn active" id="btnSubtabBulk">
+            📁 Importar Várias (JSON / Colar)
+          </button>
+          <button type="button" class="subtab-btn" id="btnSubtabSingle">
+            ✏️ Manual (1 por 1)
+          </button>
+        </div>
+
+        <!-- MODO 1: IMPORTAÇÃO EM MASSA (JSON / COLAR) -->
+        <div id="paneBulkImport" class="subtab-pane active">
+          <!-- Área de Upload de Arquivo JSON -->
+          <div class="bulk-upload-dropzone" id="dropzoneBox">
+            <input type="file" id="inputJsonFile" accept=".json,.txt" class="file-input-hidden">
+            <label for="inputJsonFile" class="file-upload-label">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0080c8" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span><strong>Carregar Arquivo .JSON</strong> ou arraste aqui</span>
+              <small class="file-chosen-name" id="fileChosenName">Nenhum arquivo selecionado</small>
+            </label>
+          </div>
+
+          <!-- Área para Colar Diretamente -->
+          <div class="form-group" style="margin-top: 14px;">
+            <div class="label-with-actions">
+              <label for="bulkQuestionsTextarea">Ou cole aqui o JSON ou as questões em texto:</label>
+              <div class="quick-helpers">
+                <button type="button" id="btnLoadJsonTemplate" class="btn-micro"
+                  title="Carregar modelo de exemplo JSON">
+                  Exemplo JSON
+                </button>
+                <button type="button" id="btnLoadTextTemplate" class="btn-micro"
+                  title="Carregar modelo de exemplo em texto comum">
+                  Exemplo Texto
+                </button>
+              </div>
+            </div>
+            <textarea id="bulkQuestionsTextarea" rows="8" class="form-control code-font"
+              placeholder="Cole aqui seu JSON ou questões em texto (ex: A) B) C) D) E) Gabarito: A)..."></textarea>
+          </div>
+
+          <!-- Opções da Importação -->
+          <div class="bulk-options-box">
+            <label class="checkbox-label">
+              <input type="checkbox" id="checkAppendBank" checked>
+              <span>Adicionar ao banco existente (sem apagar as atuais)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="checkStartExamImmediately" checked>
+              <span>Iniciar simulado de 12 questões imediatamente com as novas questões</span>
+            </label>
+          </div>
+
+          <!-- Caixa de Status da Importação -->
+          <div id="bulkStatusBox" class="bulk-status-box" style="display: none;"></div>
+
+          <!-- Ações -->
+          <div class="form-actions" style="margin-top: 12px;">
+            <button type="button" id="btnProcessBulkImport" class="btn-primary-action">
+              🚀 Adicionar Todas as Questões ao Banco
+            </button>
+            <button type="button" id="btnExportCurrentBank" class="btn-secondary-action">
+              ⬇️ Baixar Banco Atual (.JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- MODO 2: CADASTRO MANUAL INDIVIDUAL (1 POR 1) -->
+        <div id="paneSingleImport" class="subtab-pane">
+          <form id="formAddQuestion" class="app-form">
+            <div class="form-group">
+              <label for="newQuestionStatement">Enunciado da Questão: *</label>
+              <textarea id="newQuestionStatement" rows="5" class="form-control"
+                placeholder="Digite o texto da questão, contexto ou caso hipotético..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Alternativas (A a E): *</label>
+              <div class="option-input-row">
+                <span class="option-tag">A</span>
+                <input type="text" id="newOptionA" class="form-control" placeholder="Texto da alternativa A" required>
+              </div>
+              <div class="option-input-row">
+                <span class="option-tag">B</span>
+                <input type="text" id="newOptionB" class="form-control" placeholder="Texto da alternativa B" required>
+              </div>
+              <div class="option-input-row">
+                <span class="option-tag">C</span>
+                <input type="text" id="newOptionC" class="form-control" placeholder="Texto da alternativa C" required>
+              </div>
+              <div class="option-input-row">
+                <span class="option-tag">D</span>
+                <input type="text" id="newOptionD" class="form-control" placeholder="Texto da alternativa D" required>
+              </div>
+              <div class="option-input-row">
+                <span class="option-tag">E</span>
+                <input type="text" id="newOptionE" class="form-control" placeholder="Texto da alternativa E" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="newCorrectAnswer">Alternativa Correta (Gabarito): *</label>
+              <select id="newCorrectAnswer" class="form-control" required>
+                <option value="">Selecione o gabarito oficial...</option>
+                <option value="A">Alternativa A</option>
+                <option value="B">Alternativa B</option>
+                <option value="C">Alternativa C</option>
+                <option value="D">Alternativa D</option>
+                <option value="E">Alternativa E</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="newExplanation">Comentário / Explicação da Resposta (Feedback):</label>
+              <textarea id="newExplanation" rows="3" class="form-control"
+                placeholder="Explicação didática que será mostrada no final da prova..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary-action">+ Salvar Questão no Banco</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Aba 3: Histórico de Simulados Resolvidos -->
+      <section class="tab-pane" id="tab-history">
+        <div class="history-pane-header">
+          <div>
+            <h3>Histórico de Simulados</h3>
+            <p class="tab-description">Acompanhe todos os simulados já concluídos e reveja seus resultados.</p>
+          </div>
+          <button id="btnClearHistory" class="btn-clear-history" title="Apagar todo histórico">Limpar Histórico</button>
+        </div>
+
+        <div id="historyListContainer" class="history-list-container">
+          <!-- Itens do histórico serão renderizados dinamicamente aqui -->
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <!-- Modal de Confirmação para Finalização -->
+  <div class="modal-backdrop" id="confirmFinishModal">
+    <div class="modal-box confirmation-box">
+      <h3>Deseja finalizar a prova agora?</h3>
+      <p id="confirmFinishMessage">Você respondeu todas as 12 questões.</p>
+      <div class="modal-buttons">
+        <button id="btnCancelFinish" class="btn-modal-secondary">Continuar Respondendo</button>
+        <button id="btnConfirmFinish" class="btn-modal-primary">Sim, Finalizar Prova</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal / Tela de Feedback e Resultados -->
+  <div class="modal-backdrop" id="resultsModal">
+    <div class="modal-box results-box">
+      <div class="results-header">
+        <div class="results-badge" id="resultsScoreBadge">
+          <span class="score-number" id="resultScoreNumber">10 / 12</span>
+          <span class="score-percent" id="resultScorePercent">83.3% de Acerto</span>
+        </div>
+        <div class="results-title-group">
+          <h2 id="resultExamTitle">Resultado do Simulado</h2>
+          <p class="results-subtitle" id="resultExamSubtitle">Finalizado em 09/11/2026 • Duração: 00:15:32</p>
+          <div class="performance-pill" id="resultPerformancePill">Aprovado! Excelente aproveitamento</div>
+        </div>
+        <button class="btn-close-modal" id="btnCloseResults">&times;</button>
+      </div>
+
+      <!-- Resumo com Estatísticas Rápidas -->
+      <div class="results-stats-row">
+        <div class="stat-card stat-correct">
+          <span class="stat-value" id="statCorrectCount">10</span>
+          <span class="stat-label">Acertos</span>
+        </div>
+        <div class="stat-card stat-wrong">
+          <span class="stat-value" id="statWrongCount">2</span>
+          <span class="stat-label">Erros</span>
+        </div>
+        <div class="stat-card stat-time">
+          <span class="stat-value" id="statTimeSpent">15m 32s</span>
+          <span class="stat-label">Tempo Gasto</span>
+        </div>
+      </div>
+
+      <!-- Ações do Resultado -->
+      <div class="results-action-bar">
+        <button id="btnStartNewFromResults" class="btn-primary-action">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Fazer Novo Simulado
+        </button>
+        <button id="btnViewHistoryFromResults" class="btn-secondary-action">Ver no Histórico</button>
+      </div>
+
+      <!-- Gabarito Comentado e Revisão Detalhada -->
+      <div class="results-review-section">
+        <h3>Gabarito e Correção Detalhada das 12 Questões</h3>
+        <div id="resultsDetailedReviewList" class="detailed-review-list">
+          <!-- Detalhes questão a questão inseridos via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
