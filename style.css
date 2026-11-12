@@ -1455,3 +1455,103 @@ textarea.form-control {
 
 
 .category-filter-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.category-filter-list label{display:flex;align-items:center;gap:7px;font-size:.84rem;color:var(--text-body)}.category-filter-list input{accent-color:var(--primary-blue)}@media(max-width:480px){.category-filter-list{grid-template-columns:1fr}}
+
+
+/* ==========================================================================
+   BOAS-VINDAS, TEMA ESCURO E FEEDBACK GAMIFICADO
+   ========================================================================== */
+.welcome-overlay {
+  position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center;
+  justify-content: center; padding: 20px; background: rgba(15, 23, 42, .72);
+  backdrop-filter: blur(7px); opacity: 0; visibility: hidden; transition: .2s ease;
+}
+.welcome-overlay.active { opacity: 1; visibility: visible; }
+.welcome-card {
+  width: min(100%, 420px); padding: 34px; border-radius: 18px; text-align: center;
+  background: var(--bg-card); color: var(--text-dark); box-shadow: var(--shadow-modal);
+}
+.welcome-icon { font-size: 2.6rem; margin-bottom: 8px; }
+.welcome-eyebrow { color: var(--primary-blue); font-size: .75rem; font-weight: 800; letter-spacing: 1.4px; }
+.welcome-card h2 { margin: 8px 0; color: var(--text-dark); font-size: 1.55rem; }
+.welcome-card p:not(.welcome-eyebrow) { color: var(--text-body); margin-bottom: 18px; }
+.welcome-card input {
+  width: 100%; padding: 13px 14px; border: 1px solid var(--border-medium); border-radius: 8px;
+  background: var(--bg-page); color: var(--text-dark); font: inherit; margin-bottom: 14px;
+}
+.welcome-card .btn-primary-action { width: 100%; }
+.btn-theme-toggle {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border-radius: 8px;
+  border: 1px solid var(--border-medium); background: var(--bg-page); color: var(--text-dark);
+  font: 600 .82rem var(--font-family); cursor: pointer;
+}
+.gamification-feedback {
+  margin: 0 28px 16px; padding: 16px 18px; border: 1px solid var(--border-light);
+  border-radius: 12px; display: grid; grid-template-columns: auto 1fr; gap: 5px 13px;
+  align-items: center; background: var(--bg-page); color: var(--text-dark);
+}
+.gamification-emoji { font-size: 2.1rem; grid-row: span 2; }
+.gamification-copy strong { font-size: 1rem; }
+.gamification-copy p { color: var(--text-body); font-size: .86rem; margin-top: 3px; }
+.gamification-progress { grid-column: 2; height: 7px; border-radius: 20px; overflow: hidden; background: var(--border-light); }
+.gamification-progress span { display: block; width: 0; height: 100%; background: var(--primary-blue); transition: width .5s ease; }
+.gamification-feedback.low { border-left: 5px solid #ef4444; }
+.gamification-feedback.low .gamification-progress span { background: #ef4444; }
+.gamification-feedback.medium { border-left: 5px solid #e5a000; }
+.gamification-feedback.medium .gamification-progress span { background: #e5a000; }
+.gamification-feedback.high { border-left: 5px solid #10b981; }
+.gamification-feedback.high .gamification-progress span { background: #10b981; }
+
+body.dark-mode {
+  --text-dark: #e5edf7; --text-body: #c0ccda; --text-muted: #9aaabd;
+  --bg-page: #111827; --bg-card: #1f2937; --border-light: #374151; --border-medium: #4b5563;
+  --primary-blue-light: #183b56; --primary-blue-border: #245879;
+  --success-bg: #123b31; --error-bg: #451f27;
+  --shadow-card: 0 4px 18px rgba(0,0,0,.22); --shadow-modal: 0 20px 45px rgba(0,0,0,.45);
+  color-scheme: dark;
+}
+body.dark-mode .exam-date-badge,
+body.dark-mode .btn-sidebar-toggle,
+body.dark-mode .btn-secondary-action,
+body.dark-mode .btn-modal-secondary,
+body.dark-mode .btn-view-history-detail,
+body.dark-mode .tab-button,
+body.dark-mode .drawer-tabs,
+body.dark-mode .subtabs-nav,
+body.dark-mode .option-pill,
+body.dark-mode .stat-card,
+body.dark-mode .history-item-card,
+body.dark-mode .review-item-card,
+body.dark-mode .review-answers-box,
+body.dark-mode .bank-stats-box,
+body.dark-mode .bulk-upload-dropzone,
+body.dark-mode .bulk-options-box,
+body.dark-mode .results-stats-row,
+body.dark-mode .results-action-bar,
+body.dark-mode .results-header,
+body.dark-mode .modal-box,
+body.dark-mode .sidebar-drawer {
+  background-color: var(--bg-card); color: var(--text-body); border-color: var(--border-light);
+}
+body.dark-mode .results-header { background: var(--bg-card); }
+body.dark-mode .results-stats-row { background: #182231; }
+body.dark-mode .tab-button.active,
+body.dark-mode .subtab-btn.active { background: #263548; color: #7cc8f4; }
+body.dark-mode .form-control,
+body.dark-mode .welcome-card input { background: #111827; color: var(--text-dark); border-color: var(--border-medium); }
+body.dark-mode .review-explanation { background: #172b43; color: #c7ddf7; }
+body.dark-mode .correct-answer-line { color: #6ee7b7; }
+body.dark-mode .user-chosen-line.correct-text { color: #6ee7b7; }
+body.dark-mode .user-chosen-line.wrong-text { color: #fca5a5; }
+body.dark-mode .btn-micro,
+body.dark-mode .option-tag { background: #263548; color: var(--text-body); border-color: var(--border-medium); }
+body.dark-mode .btn-secondary-action:hover,
+body.dark-mode .btn-sidebar-toggle:hover { background: #263548; }
+body.dark-mode .results-review-section h3 { color: var(--text-dark); }
+body.dark-mode .welcome-card { background: var(--bg-card); }
+@media (max-width: 600px) {
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .btn-theme-toggle span { display: none; }
+  .gamification-feedback { margin: 0 14px 14px; }
+  .results-action-bar { flex-wrap: wrap; }
+  .results-action-bar button { flex: 1 1 100%; justify-content: center; }
+}
