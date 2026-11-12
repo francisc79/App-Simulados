@@ -40,6 +40,7 @@ const dom = {
   welcomeOverlay: document.getElementById("welcomeOverlay"),
   welcomeForm: document.getElementById("welcomeForm"),
   studentNameInput: document.getElementById("studentNameInput"),
+  gamificationFeedback: document.getElementById("gamificationFeedback"),
   gamificationEmoji: document.getElementById("gamificationEmoji"),
   gamificationTitle: document.getElementById("gamificationTitle"),
   gamificationMessage: document.getElementById("gamificationMessage"),
