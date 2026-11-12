@@ -423,7 +423,6 @@ dom.btnNext.addEventListener("click", () => {
     saveActiveExamState();
     renderActiveQuestion();
     renderBubbles();
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 });
 
