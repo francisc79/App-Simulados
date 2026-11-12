@@ -240,6 +240,15 @@ Em condições normais (ceteris paribus), quando o preço de um bem normal se el
   }
 ];
 
+// Classificação inicial do banco de demonstração. Questões antigas sem tema recebem a categoria correspondente.
+const DEFAULT_CATEGORY_BY_ID = {
+  "q-1": "Português", "q-2": "Conhecimentos Gerais", "q-3": "Matemática",
+  "q-4": "Português", "q-5": "Conhecimentos Gerais", "q-6": "Didática",
+  "q-7": "Matemática", "q-8": "Conhecimentos Gerais", "q-9": "Legislação",
+  "q-10": "Conhecimentos Gerais", "q-11": "Didática", "q-12": "Português",
+  "q-13": "Conhecimentos Gerais", "q-14": "Tipologia Textual", "q-15": "Matemática", "q-16": "Didática"
+};
+
 // Funções de inicialização e persistência de dados
 function getInitialQuestions() {
   const stored = localStorage.getItem("anhanguera_question_bank");
@@ -247,7 +256,12 @@ function getInitialQuestions() {
     try {
       const parsed = JSON.parse(stored);
       if (Array.isArray(parsed) && parsed.length >= 12) {
-        return parsed;
+        const migrated = parsed.map((question) => ({
+          ...question,
+          category: question.category || question.categoria || DEFAULT_CATEGORY_BY_ID[question.id] || "Geral"
+        }));
+        localStorage.setItem("anhanguera_question_bank", JSON.stringify(migrated));
+        return migrated;
       }
     } catch (e) {
       console.error("Erro ao carregar banco do localStorage", e);
