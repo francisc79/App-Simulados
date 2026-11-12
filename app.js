@@ -363,38 +363,9 @@ function selectOption(optionId) {
 // ==========================================
 
 function renderBubbles() {
-  dom.questionBubblesGrid.innerHTML = "";
-
-  for (let i = 0; i < EXAM_LENGTH; i++) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "bubble-btn";
-
-    const hasAnswer = userAnswers[i] !== undefined;
-    const isCurrent = i === currentQuestionIndex;
-
-    // Se respondida, exibe o número e a letra (ex: 1A, 2C, 3D, 4A)
-    // Se não respondida, apenas o número
-    if (hasAnswer) {
-      btn.textContent = `${i + 1}${userAnswers[i]}`;
-      btn.classList.add("answered");
-    } else {
-      btn.textContent = `${i + 1}`;
-    }
-
-    if (isCurrent) {
-      btn.classList.add("current");
-    }
-
-    btn.addEventListener("click", () => {
-      currentQuestionIndex = i;
-      saveActiveExamState();
-      renderActiveQuestion();
-      renderBubbles();
-    });
-
-    dom.questionBubblesGrid.appendChild(btn);
-  }
+  // A navegação numerada foi removida da interface.
+  // Mantém a função para compatibilidade com os pontos que atualizam o simulado.
+  return;
 }
 
 function updateProgressBar() {
