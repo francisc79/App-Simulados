@@ -1342,6 +1342,74 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ==========================================
+// PERSONALIZAÇÃO, TEMA E BOAS-VINDAS
+// ==========================================
+const STUDENT_NAME_KEY = "simulados_student_name";
+const THEME_KEY = "simulados_theme";
+
+function getStudentName() {
+  return localStorage.getItem(STUDENT_NAME_KEY) || "";
+}
+
+function showWelcomeIfNeeded() {
+  const savedName = getStudentName();
+  if (savedName) {
+    dom.welcomeOverlay.classList.remove("active");
+    dom.studentNameInput.value = savedName;
+    return;
+  }
+  dom.welcomeOverlay.classList.add("active");
+  setTimeout(() => dom.studentNameInput.focus(), 100);
+}
+
+dom.welcomeForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const name = dom.studentNameInput.value.trim();
+  if (!name) {
+    dom.studentNameInput.focus();
+    return;
+  }
+  localStorage.setItem(STUDENT_NAME_KEY, name);
+  dom.welcomeOverlay.classList.remove("active");
+  showToast(`Bem-vindo(a), ${name}! Sua jornada começa agora.`);
+});
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark-mode", isDark);
+  if (dom.btnThemeToggle) {
+    dom.btnThemeToggle.innerHTML = isDark ? "☀️ <span>Modo claro</span>" : "🌙 <span>Modo escuro</span>";
+    dom.btnThemeToggle.setAttribute("aria-label", isDark ? "Ativar modo claro" : "Ativar modo escuro");
+    dom.btnThemeToggle.title = isDark ? "Ativar modo claro" : "Ativar modo escuro";
+  }
+}
+
+function initializeTheme() {
+  applyTheme(localStorage.getItem(THEME_KEY) || "light");
+}
+
+if (dom.btnThemeToggle) {
+  dom.btnThemeToggle.addEventListener("click", () => {
+    const nextTheme = document.body.classList.contains("dark-mode") ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, nextTheme);
+    applyTheme(nextTheme);
+  });
+}
+
+function restartSameExam() {
+  dom.resultsModal.classList.remove("active");
+  userAnswers = {};
+  currentQuestionIndex = 0;
+  timerSeconds = 0;
+  saveActiveExamState();
+  initTimer();
+  renderActiveQuestion();
+  renderBubbles();
+  updateProgressBar();
+  showToast("Prova reiniciada! Você pode tentar novamente.");
+}
+
+// ==========================================
 // INICIALIZAÇÃO DA APLICAÇÃO
 // ==========================================
 
