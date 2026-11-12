@@ -14,6 +14,7 @@ let questionBank = [];
 let currentExamQuestions = [];
 let userAnswers = {}; // { [questionIndex]: "A" | "B" | "C" | "D" | "E" }
 let currentQuestionIndex = 0;
+let selectedSubject = "all";
 
 let timerInterval = null;
 let timerSeconds = 0;
@@ -28,6 +29,8 @@ let examMetadata = {
 // ELEMENTOS DO DOM
 // ==========================================
 const dom = {
+  // Seleção de disciplina
+  subjectSelectionScreen: document.getElementById("subjectSelectionScreen"),
   // Header
   headerExamTitle: document.getElementById("headerExamTitle"),
   headerExamDate: document.getElementById("headerExamDate"),
@@ -197,6 +200,10 @@ function loadBankAndMetadata() {
 
 function updateBankCounters() {
   if (dom.totalBankQuestionsCount) dom.totalBankQuestionsCount.textContent = questionBank.length;
+  const ptCount = questionBank.filter(q => q.subject === "Português").length;
+  const mtCount = questionBank.filter(q => q.subject === "Matemática").length;
+  const categoryCount = document.getElementById("categoryBankCount");
+  if (categoryCount) categoryCount.textContent = `Português: ${ptCount} • Matemática: ${mtCount}`;
   if (dom.bankCounterInTab) dom.bankCounterInTab.textContent = `Banco: ${questionBank.length}`;
 }
 
@@ -216,44 +223,31 @@ function saveMetadata() {
 // INICIALIZAÇÃO DO SIMULADO DE 12 QUESTÕES
 // ==========================================
 
-function startExam(questionsToUse = null) {
-  if (questionsToUse && questionsToUse.length === EXAM_LENGTH) {
-    currentExamQuestions = [...questionsToUse];
-  } else {
-    // Se o banco tiver pelo menos 12 questões, pegamos as 12 primeiras ou sorteamos
-    // Para manter a fidelidade com a Questão 4 do modelo na primeira inicialização,
-    // garantimos que as 12 questões iniciais venham prontas.
-    const savedActiveExam = localStorage.getItem("anhanguera_current_exam_state");
-    if (savedActiveExam) {
-      try {
-        const parsed = JSON.parse(savedActiveExam);
-        if (parsed.questions && parsed.questions.length === EXAM_LENGTH) {
-          currentExamQuestions = parsed.questions;
-          userAnswers = parsed.answers || {};
-          currentQuestionIndex = parsed.currentIndex || 0;
-          timerSeconds = parsed.timerSeconds || 0;
-          initTimer();
-          renderActiveQuestion();
-          renderBubbles();
-          updateProgressBar();
-          return;
-        }
-      } catch (e) {
-        console.error("Erro ao restaurar prova ativa", e);
-      }
-    }
+function showSubjectSelection() {
+  pauseTimer();
+  if (dom.subjectSelectionScreen) dom.subjectSelectionScreen.classList.remove("hidden");
+  document.querySelector(".exam-container").classList.add("hidden");
+  localStorage.removeItem("anhanguera_current_exam_state");
+}
 
-    // Caso novo: pega as 12 primeiras do banco
-    if (questionBank.length >= EXAM_LENGTH) {
-      currentExamQuestions = questionBank.slice(0, EXAM_LENGTH);
-    } else {
-      currentExamQuestions = [...questionBank];
-    }
-    userAnswers = {};
-    currentQuestionIndex = 0;
-    timerSeconds = 0;
+function startExam(subject = "all") {
+  selectedSubject = subject;
+  const filtered = subject === "all" ? questionBank : questionBank.filter(q => q.subject === subject);
+  if (filtered.length < EXAM_LENGTH) {
+    showToast("Ainda não há 12 questões disponíveis nessa disciplina.");
+    return;
   }
-
+  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+  currentExamQuestions = shuffled.slice(0, EXAM_LENGTH);
+  userAnswers = {};
+  currentQuestionIndex = 0;
+  timerSeconds = 0;
+  examMetadata.title = subject === "all"
+    ? "Simulado de Avaliação seleção 2026 — Português e Matemática"
+    : "Simulado de Avaliação seleção 2026 — " + subject;
+  saveMetadata();
+  if (dom.subjectSelectionScreen) dom.subjectSelectionScreen.classList.add("hidden");
+  document.querySelector(".exam-container").classList.remove("hidden");
   saveActiveExamState();
   initTimer();
   renderActiveQuestion();
@@ -262,24 +256,7 @@ function startExam(questionsToUse = null) {
 }
 
 function generateNewRandomExam() {
-  if (questionBank.length < EXAM_LENGTH) {
-    showToast(`O banco possui apenas ${questionBank.length} questões. Mínimo necessário: 12.`);
-    return;
-  }
-
-  // Embaralha o banco de questões e seleciona 12
-  const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
-  currentExamQuestions = shuffled.slice(0, EXAM_LENGTH);
-  userAnswers = {};
-  currentQuestionIndex = 0;
-  timerSeconds = 0;
-
-  saveActiveExamState();
-  renderActiveQuestion();
-  renderBubbles();
-  updateProgressBar();
-  closeSidebar();
-  showToast("Novo simulado de 12 questões iniciado com sucesso!");
+  showSubjectSelection();
 }
 
 function saveActiveExamState() {
@@ -725,6 +702,11 @@ dom.btnNewRandomExam.addEventListener("click", () => {
   generateNewRandomExam();
 });
 
+["Português", "Matemática", "all"].forEach(subject => {
+  const btn = document.querySelector(`[data-subject="${subject}"]`);
+  if (btn) btn.addEventListener("click", () => startExam(subject));
+});
+
 // Restaurar Banco de Questões Padrão
 dom.btnResetToDefaultBank.addEventListener("click", () => {
   if (confirm("Deseja restaurar o banco de questões padrão de fábrica? Questões adicionais manuais serão reiniciadas.")) {
@@ -797,6 +779,8 @@ dom.formAddQuestion.addEventListener("submit", (e) => {
 
   const newQuestion = {
     id: "custom-" + Date.now(),
+    subject: document.getElementById("newQuestionSubject")?.value || "Português",
+    topic: "Cadastro manual",
     statement: statement,
     options: [
       { id: "A", text: optA },
@@ -1007,6 +991,11 @@ function parseQuestionsFromInput(inputStr) {
 
         normalized.push({
           id: "bulk-json-" + Date.now() + "-" + (i + 1),
+          subject: it.subject || it.disciplina || "Português",
+          topic: it.topic || it.tema || "Geral",
+          subject: it.subject || it.disciplina || "Português",
+          topic: it.topic || it.tema || "Geral",
+          type: it.type || "multiple_choice",
           statement: statement,
           options: options,
           correctAnswer: correctAnswer,
@@ -1317,6 +1306,6 @@ function initializeThemeToggle() {
 document.addEventListener("DOMContentLoaded", () => {
   initializeThemeToggle();
   loadBankAndMetadata();
-  startExam();
+  showSubjectSelection();
   updateHistoryUI();
 });
