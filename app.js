@@ -993,8 +993,6 @@ function parseQuestionsFromInput(inputStr) {
           id: "bulk-json-" + Date.now() + "-" + (i + 1),
           subject: it.subject || it.disciplina || "Português",
           topic: it.topic || it.tema || "Geral",
-          subject: it.subject || it.disciplina || "Português",
-          topic: it.topic || it.tema || "Geral",
           type: it.type || "multiple_choice",
           statement: statement,
           options: options,
