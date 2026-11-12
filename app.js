@@ -8,7 +8,10 @@
 // ==========================================
 // ESTADO GLOBAL DA APLICAÇÃO
 // ==========================================
-const EXAM_LENGTH = 12;
+let EXAM_LENGTH = 12;
+const DEFAULT_EXAM_LENGTH = 12;
+const QUESTION_CATEGORIES = ["BNCC", "LDB", "Tipologia Textual", "Gêneros Textuais", "Português", "Matemática", "Legislação", "Didática", "Conhecimentos Gerais", "Geral"];
+let selectedCategories = [];
 
 let questionBank = [];
 let currentExamQuestions = [];
@@ -90,6 +93,9 @@ const dom = {
   newOptionE: document.getElementById("newOptionE"),
   newCorrectAnswer: document.getElementById("newCorrectAnswer"),
   newExplanation: document.getElementById("newExplanation"),
+  newQuestionCategory: document.getElementById("newQuestionCategory"),
+  examQuestionCount: document.getElementById("examQuestionCount"),
+  categoryFilters: document.querySelectorAll(".category-filter"),
 
   // Histórico
   historyListContainer: document.getElementById("historyListContainer"),
@@ -199,6 +205,20 @@ function updateBankCounters() {
   if (dom.bankCounterInTab) dom.bankCounterInTab.textContent = `Banco: ${questionBank.length}`;
 }
 
+function getQuestionCategory(question) {
+  const value = question.category || question.categoria || "Geral";
+  return QUESTION_CATEGORIES.includes(value) ? value : "Geral";
+}
+function getEligibleQuestions() {
+  if (!selectedCategories.length) return [...questionBank];
+  return questionBank.filter((question) => selectedCategories.includes(getQuestionCategory(question)));
+}
+function updateExamLengthFromSettings() {
+  const requested = Number(dom.examQuestionCount?.value || DEFAULT_EXAM_LENGTH);
+  EXAM_LENGTH = Number.isInteger(requested) ? Math.min(100, Math.max(1, requested)) : DEFAULT_EXAM_LENGTH;
+  selectedCategories = [...dom.categoryFilters].filter((input) => input.checked).map((input) => input.value);
+}
+
 function updateHeaderMetadata() {
   dom.headerExamTitle.textContent = examMetadata.title;
   dom.headerExamDate.textContent = `Data: ${formatBrazilianDate(examMetadata.date)}`;
@@ -261,13 +281,13 @@ function startExam(questionsToUse = null) {
 }
 
 function generateNewRandomExam() {
-  if (questionBank.length < EXAM_LENGTH) {
-    showToast(`O banco possui apenas ${questionBank.length} questões. Mínimo necessário: 12.`);
+  updateExamLengthFromSettings();
+  const eligibleQuestions = getEligibleQuestions();
+  if (eligibleQuestions.length < EXAM_LENGTH) {
+    showToast(`Há ${eligibleQuestions.length} questões disponíveis nos temas selecionados. Você solicitou ${EXAM_LENGTH}.`);
     return;
   }
-
-  // Embaralha o banco de questões e seleciona 12
-  const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+  const shuffled = [...eligibleQuestions].sort(() => Math.random() - 0.5);
   currentExamQuestions = shuffled.slice(0, EXAM_LENGTH);
   userAnswers = {};
   currentQuestionIndex = 0;
@@ -278,7 +298,7 @@ function generateNewRandomExam() {
   renderBubbles();
   updateProgressBar();
   closeSidebar();
-  showToast("Novo simulado de 12 questões iniciado com sucesso!");
+  showToast(`Novo simulado com ${EXAM_LENGTH} questões iniciado!`);
 }
 
 function saveActiveExamState() {
@@ -455,12 +475,12 @@ dom.btnNext.addEventListener("click", () => {
 
 dom.btnFinish.addEventListener("click", () => {
   const answeredCount = Object.keys(userAnswers).length;
-  const unansweredCount = EXAM_LENGTH - answeredCount;
+  const unansweredCount = currentExamQuestions.length - answeredCount;
 
   if (unansweredCount > 0) {
-    dom.confirmFinishMessage.textContent = `Você respondeu ${answeredCount} de 12 questões. Ainda restam ${unansweredCount} sem resposta. Deseja realmente finalizar?`;
+    dom.confirmFinishMessage.textContent = `Você respondeu ${answeredCount} de ${currentExamQuestions.length} questões. Ainda restam ${unansweredCount} sem resposta. Deseja realmente finalizar?`;
   } else {
-    dom.confirmFinishMessage.textContent = `Você respondeu todas as 12 questões. Deseja concluir a avaliação e ver seu resultado?`;
+    dom.confirmFinishMessage.textContent = `Você respondeu todas as ${currentExamQuestions.length} questões. Deseja concluir a avaliação e ver seu resultado?`;
   }
 
   dom.confirmFinishModal.classList.add("active");
@@ -486,9 +506,9 @@ function finishExamAndShowResults() {
     }
   });
 
-  const wrongCount = EXAM_LENGTH - correctCount;
-  const scorePercent = ((correctCount / EXAM_LENGTH) * 100).toFixed(1);
-  const isPassed = correctCount >= 7; // Anhanguera geralmente aprova com >= 60%
+  const wrongCount = currentExamQuestions.length - correctCount;
+  const scorePercent = ((correctCount / currentExamQuestions.length) * 100).toFixed(1);
+  const isPassed = correctCount / currentExamQuestions.length >= 0.6;
 
   const examResultRecord = {
     id: "result-" + Date.now(),
@@ -628,7 +648,7 @@ function updateHistoryUI() {
     dom.historyListContainer.innerHTML = `
       <div class="empty-history-notice">
         Nenhum simulado finalizado até o momento.<br>
-        Resolva um simulado de 12 questões para registrar seu progresso!
+        Resolva um simulado para registrar seu progresso!
       </div>
     `;
     return;
@@ -647,7 +667,7 @@ function updateHistoryUI() {
       <div class="history-item-top">
         <span class="history-item-title">${escapeHtml(item.title)}</span>
         <span class="history-score-pill ${item.isPassed ? "passed" : "failed"}">
-          ${item.correctCount}/12 (${item.scorePercent}%)
+          ${item.correctCount}/${item.totalQuestions} (${item.scorePercent}%)
         </span>
       </div>
       <div class="history-item-meta">
@@ -805,6 +825,7 @@ dom.formAddQuestion.addEventListener("submit", (e) => {
       { id: "E", text: optE }
     ],
     correctAnswer: correctAnswer,
+    category: dom.newQuestionCategory?.value || "Geral",
     explanation: explanation || "Gabarito oficial: Alternativa " + correctAnswer
   };
 
@@ -1003,12 +1024,14 @@ function parseQuestionsFromInput(inputStr) {
         }
 
         const explanation = (it.explanation || it.explicacao || it.comentario || it.justificativa || "").trim();
+        const category = (it.category || it.categoria || it.tema || "Geral").toString().trim();
 
         normalized.push({
           id: "bulk-json-" + Date.now() + "-" + (i + 1),
           statement: statement,
           options: options,
           correctAnswer: correctAnswer,
+          category: QUESTION_CATEGORIES.includes(category) ? category : "Geral",
           explanation: explanation || `Gabarito oficial: Alternativa ${correctAnswer}`
         });
       }
@@ -1057,6 +1080,7 @@ function parseQuestionsFromInput(inputStr) {
         statement: statement,
         options: sortedOptions,
         correctAnswer: gabarito,
+        category: "Geral",
         explanation: explanation || `Gabarito oficial: Alternativa ${gabarito}`
       });
     }
@@ -1205,12 +1229,14 @@ if (dom.btnProcessBulkImport) {
 
     // Se marcado para iniciar simulado imediatamente com as novas questões
     if (startImmediately) {
-      if (result.questions.length >= EXAM_LENGTH) {
-        currentExamQuestions = result.questions.slice(0, EXAM_LENGTH);
+      updateExamLengthFromSettings();
+      const importedEligible = result.questions.filter((question) => !selectedCategories.length || selectedCategories.includes(getQuestionCategory(question)));
+      if (importedEligible.length >= EXAM_LENGTH) {
+        currentExamQuestions = importedEligible.slice(0, EXAM_LENGTH);
       } else {
-        const needed = EXAM_LENGTH - result.questions.length;
-        const remainder = questionBank.filter((q) => !result.questions.some((rq) => rq.id === q.id));
-        currentExamQuestions = [...result.questions, ...remainder.slice(0, needed)];
+        const remainder = getEligibleQuestions().filter((q) => !importedEligible.some((rq) => rq.id === q.id));
+        currentExamQuestions = [...importedEligible, ...remainder].slice(0, EXAM_LENGTH);
+        if (currentExamQuestions.length < EXAM_LENGTH) showToast(`Há apenas ${currentExamQuestions.length} questões compatíveis com os filtros.`);
       }
 
       userAnswers = {};
