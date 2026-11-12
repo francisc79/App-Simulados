@@ -20,7 +20,7 @@ let timerSeconds = 0;
 let isTimerRunning = false;
 
 let examMetadata = {
-  title: "Simulado de Avaliação Oficial - Anhanguera",
+  title: "Simulado de Avaliação seleção 2026",
   date: new Date().toISOString().split("T")[0] // AAAA-MM-DD
 };
 
