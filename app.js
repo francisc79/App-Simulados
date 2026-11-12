@@ -21,7 +21,7 @@ let timerSeconds = 0;
 let isTimerRunning = false;
 
 let examMetadata = {
-  title: "Simulado de Avaliação — Jamile",
+  title: "Simulado de Avaliação — Professora Jamile",
   date: new Date().toISOString().split("T")[0] // AAAA-MM-DD
 };
 
@@ -243,8 +243,8 @@ function startExam(subject = "all") {
   currentQuestionIndex = 0;
   timerSeconds = 0;
   examMetadata.title = subject === "all"
-    ? "Simulado de Avaliação — Jamile — Português e Matemática"
-    : "Simulado de Avaliação — Jamile — " + subject;
+    ? "Simulado de Avaliação — Professora Jamile — Português e Matemática"
+    : "Simulado de Avaliação — Professora Jamile — " + subject;
   saveMetadata();
   if (dom.subjectSelectionScreen) dom.subjectSelectionScreen.classList.add("hidden");
   document.querySelector(".exam-container").classList.remove("hidden");
