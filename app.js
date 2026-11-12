@@ -256,6 +256,7 @@ function startExam(subject = "all") {
 }
 
 function generateNewRandomExam() {
+  closeSidebar();
   showSubjectSelection();
 }
 
