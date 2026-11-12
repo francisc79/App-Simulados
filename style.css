@@ -1452,3 +1452,106 @@ textarea.form-control {
     width: 100%;
   }
 }
+
+
+/* ==========================================================================
+   MODO ESCURO — alternância de tema
+   ========================================================================== */
+.btn-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--border-medium);
+  border-radius: 8px;
+  background: var(--bg-page);
+  color: var(--text-dark);
+  font: 600 .85rem var(--font-family);
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+.btn-theme-toggle:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+body.dark-mode {
+  --text-dark: #e5edf7;
+  --text-body: #cbd5e1;
+  --text-muted: #a8b5c7;
+  --bg-page: #111827;
+  --bg-card: #1f2937;
+  --border-light: #374151;
+  --border-medium: #4b5563;
+  --primary-blue-light: #183b56;
+  --primary-blue-border: #245879;
+  --success-bg: #123b31;
+  --error-bg: #451f27;
+  --shadow-card: 0 4px 18px rgba(0,0,0,.22);
+  --shadow-modal: 0 20px 45px rgba(0,0,0,.45);
+  color-scheme: dark;
+}
+body.dark-mode .app-header,
+body.dark-mode .exam-status-card,
+body.dark-mode .option-pill,
+body.dark-mode .sidebar-drawer,
+body.dark-mode .modal-box,
+body.dark-mode .results-box,
+body.dark-mode .stat-card,
+body.dark-mode .history-item-card,
+body.dark-mode .review-item-card,
+body.dark-mode .btn-theme-toggle,
+body.dark-mode .btn-sidebar-toggle,
+body.dark-mode .btn-secondary-action,
+body.dark-mode .btn-modal-secondary,
+body.dark-mode .tab-button,
+body.dark-mode .subtab-btn,
+body.dark-mode .bulk-upload-dropzone,
+body.dark-mode .bulk-options-box,
+body.dark-mode .bank-stats-box,
+body.dark-mode .review-answers-box {
+  background-color: var(--bg-card);
+  color: var(--text-body);
+  border-color: var(--border-light);
+}
+body.dark-mode .exam-date-badge,
+body.dark-mode .results-stats-row,
+body.dark-mode .results-action-bar,
+body.dark-mode .results-header {
+  background: var(--bg-card);
+  color: var(--text-body);
+  border-color: var(--border-light);
+}
+body.dark-mode .form-control,
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #111827;
+  color: var(--text-dark);
+  border-color: var(--border-medium);
+}
+body.dark-mode .option-row:hover .option-pill,
+body.dark-mode .tab-button.active,
+body.dark-mode .subtab-btn.active {
+  background-color: #263548;
+  color: #e5edf7;
+}
+body.dark-mode .review-explanation {
+  background-color: #172b43;
+  color: #c7ddf7;
+}
+body.dark-mode .correct-answer-line,
+body.dark-mode .user-chosen-line.correct-text {
+  color: #6ee7b7;
+}
+body.dark-mode .user-chosen-line.wrong-text {
+  color: #fca5a5;
+}
+body.dark-mode .btn-sidebar-toggle:hover,
+body.dark-mode .btn-theme-toggle:hover {
+  background-color: #263548;
+}
+@media (max-width: 600px) {
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .btn-theme-toggle span { display: none; }
+}
